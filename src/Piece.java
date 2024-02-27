@@ -10,6 +10,6 @@ public abstract class Piece {
         return color;
     }
    
-    public abstract ArrayList<Position> getMoves();
-
+    public abstract ArrayList<Vector> getVectors();
+        
 }

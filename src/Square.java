@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Square {
     private Position position; 
     private Piece piece; 
@@ -19,5 +21,12 @@ public class Square {
         return position;
     }
 
-    
+    public ArrayList<Vector> getVectors(){
+        if(piece != null){
+            return piece.getVectors();
+        }
+        return null;
+    }
+
+
 }
