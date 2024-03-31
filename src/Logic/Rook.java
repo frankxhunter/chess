@@ -1,8 +1,10 @@
+package Logic;
 import java.util.ArrayList;
 
 public class Rook extends Piece {
     public Rook(Color color){
         super(color);
+        setSimbology("R");
     }
 
     @Override
@@ -15,4 +17,5 @@ public class Rook extends Piece {
 
         return vectors; 
     }
+
 }

@@ -1,3 +1,4 @@
+package Logic;
 public class Position {
     private int posX, posY;
 
@@ -11,5 +12,9 @@ public class Position {
     }
     public int getPosY() {
         return posY;
+    }
+    @Override
+    public String toString() {
+        return "("+posX+", "+posY+")";
     }
 }

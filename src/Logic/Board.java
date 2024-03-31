@@ -1,3 +1,4 @@
+package Logic;
 import java.util.ArrayList;
 
 public class Board {
@@ -20,11 +21,15 @@ public class Board {
             }
         }
     } 
-
+    /* Esta funcion se utiliza para colocar las piezas del juego en el tablero*/
+    public void putPiece(Piece piece, Position pos){
+        squareList.get(pos.getPosX()).get(pos.getPosY()).setPiece(piece);
+    }
+    /* Esta funcion imprime en consola el tablero completo*/
     public void printBoard(){
         for(ArrayList<Square> e : this.squareList){
             for(Square s : e){
-                System.out.print("(" + s.getPosition().getPosX() + "," + s.getPosition().getPosY() + ")-");
+                System.out.print("(" + s.toString() + ")-");
             }
             System.out.println();
         }

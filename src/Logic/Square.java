@@ -1,3 +1,4 @@
+package Logic;
 import java.util.ArrayList;
 
 public class Square {
@@ -26,6 +27,11 @@ public class Square {
             return piece.getVectors();
         }
         return null;
+    }
+
+    @Override
+    public String toString(){
+        return piece != null ? piece.toString(): "  ";
     }
 
 

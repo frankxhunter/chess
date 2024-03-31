@@ -1,3 +1,4 @@
+package Logic;
 public class Vector {
     private int posX, posY;
     private int magnitude= 0; 
