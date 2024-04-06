@@ -34,5 +34,11 @@ public class Square {
         return piece != null ? piece.toString(): "  ";
     }
 
+    public Piece removePiece(){
+        Piece piece = this.piece;
+        this.piece = null;
+        return piece;
+    }
+
 
 }

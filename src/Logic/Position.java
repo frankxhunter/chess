@@ -1,4 +1,5 @@
 package Logic;
+
 public class Position {
     private int posX, posY;
 
@@ -10,11 +11,19 @@ public class Position {
     public int getPosX() {
         return posX;
     }
+
     public int getPosY() {
         return posY;
     }
+
+    public boolean isEqual(Position pos) {
+        if (pos.getPosX() == posX && pos.getPosY() == posY)
+            return true;
+        return false;
+    }
+
     @Override
     public String toString() {
-        return "("+posX+", "+posY+")";
+        return "(" + posX + ", " + posY + ")";
     }
 }

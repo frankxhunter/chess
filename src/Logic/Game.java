@@ -18,5 +18,14 @@ public class Game {
         return board.getMovesOfPiece(position);
     }
 
+    public boolean movePiece(Position initialPosition, Position finalPosition){
+        boolean result = false;
+        // TODO Revisar si se cumplen las condiciones del juego
+        if(true){
+            result = board.movePiece(initialPosition, finalPosition);
+        }
+        return result;
+    }
+
 
 }

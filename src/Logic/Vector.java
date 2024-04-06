@@ -13,7 +13,7 @@ public class Vector {
         }
     }
 
-    public Position  getNextMove(Position position){
+    public Position getNextMove(Position position){
         if( magnitude > 0 || largeMove){
             Position next = new Position(position.getPosX() + this.posX,position.getPosY() + this.posY);
             if(!largeMove)
