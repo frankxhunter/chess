@@ -21,6 +21,9 @@ public class Position {
             return true;
         return false;
     }
+    public Position increaseBy(int movesX, int movesY){
+        return new Position(posX + movesX, posY + movesY);
+    }
 
     @Override
     public String toString() {

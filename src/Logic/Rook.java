@@ -8,14 +8,36 @@ public class Rook extends Piece {
     }
 
     @Override
-    public ArrayList<Vector> getVectors() {
-        ArrayList<Vector> vectors = new ArrayList<Vector>();
-        vectors.add(new Vector(1,0, 0 , true));
-        vectors.add(new Vector(0,1, 0 , true));
-        vectors.add(new Vector(-1,0, 0 , true));
-        vectors.add(new Vector(0,-1, 0 , true));
+    public ArrayList<Position> getMoves() {
+        ArrayList<Position> moves = new ArrayList<Position>();
 
-        return vectors; 
+        int moveX = 1;
+        int moveY= 0;
+        Position nexPosition = this.getPosition().increaseBy(moveX, moveY);
+        while(this.getBoard().whoIsHere(nexPosition)!= null && this.getBoard().whoIsHere(nexPosition) != this.getColor()){
+            moves.add(nexPosition);
+            moveX++;
+            nexPosition = this.getPosition().increaseBy(moveX, moveY);
+        }
+        moveX = 0;
+        while(this.getBoard().whoIsHere(nexPosition)!= null && this.getBoard().whoIsHere(nexPosition) != this.getColor()){
+            moves.add(nexPosition);
+            moveX--;
+            nexPosition = this.getPosition().increaseBy(moveX, moveY);
+        }
+        moveX = 0;
+        while(this.getBoard().whoIsHere(nexPosition)!= null && this.getBoard().whoIsHere(nexPosition) != this.getColor()){
+            moves.add(nexPosition);
+            moveY--;
+            nexPosition = this.getPosition().increaseBy(moveX, moveY);
+        }
+        moveY = 0;
+        while(this.getBoard().whoIsHere(nexPosition)!= null && this.getBoard().whoIsHere(nexPosition) != this.getColor()){
+            moves.add(nexPosition);
+            moveY++;
+        }
+        return moves;
+      
     }
 
 }

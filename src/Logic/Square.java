@@ -1,4 +1,5 @@
 package Logic;
+
 import java.util.ArrayList;
 
 public class Square {
@@ -22,12 +23,7 @@ public class Square {
         return position;
     }
 
-    public ArrayList<Vector> getVectors(){
-        if(piece != null){
-            return piece.getVectors();
-        }
-        return null;
-    }
+
 
     @Override
     public String toString(){
@@ -38,6 +34,19 @@ public class Square {
         Piece piece = this.piece;
         this.piece = null;
         return piece;
+    }
+
+    public Color colorPieceOccuped(){
+        if(piece != null){
+            return piece.getColor();
+        }
+        return null;
+    }
+    public ArrayList<Position> getMovesOfPiece(){
+        if(piece == null){
+            return null;
+        }
+        return piece.getMoves();
     }
 
 

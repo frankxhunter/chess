@@ -7,10 +7,11 @@ import Logic.Position;
 public class Main {
     public static void main(String[] args) {
         Game chess = new Game(8, 8);
-        Scanner scan = new Scanner(System.in);
-        while (true != false) {
-            chess.printBoard();
-            System.out.println("Cual pieza quieres mover: ");
+        try(Scanner scan = new Scanner(System.in)){
+
+            while (true) {
+                chess.printBoard();
+                System.out.println("Cual pieza quieres mover: ");
             System.out.print("Selecciona la posición en las X: ");
             int posX = scan.nextInt();
 
@@ -33,5 +34,8 @@ public class Main {
                 System.out.println("No es posible realizar dicho movimiento");
             }
         }
+    }catch(Error e){
+        e.printStackTrace();
+    }
     }
 }

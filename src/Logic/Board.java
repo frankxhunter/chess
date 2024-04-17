@@ -3,7 +3,7 @@ package Logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Board {
+public class Board implements StatusBoard{
     private ArrayList<ArrayList<Square>> squareList;
     private int height;
     private int width;
@@ -13,11 +13,11 @@ public class Board {
             this.height = height;
             this.width = width;
             squareList = new ArrayList<ArrayList<Square>>(width);
-            for (int i = 0; i < width; i++) {
+            for (int i = 0; i < this.width; i++) {
                 ArrayList<Square> aux = new ArrayList<Square>(height);
                 squareList.add(aux);
 
-                for (int j = 0; j < height; j++) {
+                for (int j = 0; j < this.height; j++) {
                     aux.add(new Square(new Position(i, j), null));
                 }
             }
@@ -27,6 +27,10 @@ public class Board {
     /* Esta función se utiliza para colocar las piezas del juego en el tablero */
     public void putPiece(Piece piece, Position pos) {
         squareList.get(pos.getPosX()).get(pos.getPosY()).setPiece(piece);
+    }
+
+    public Color whoIsHere(Position pos){
+        return squareList.get(pos.getPosX()).get(pos.getPosY()).colorPieceOccuped();
     }
 
     /* Esta función imprime en consola el tablero completo */
@@ -42,24 +46,7 @@ public class Board {
     /* Obtiene todos los movimientos de una pieza especifica */
     public ArrayList<Position> getMovesOfPiece(Position position) {
         Square square = squareList.get(position.getPosX()).get(position.getPosY());
-        ArrayList<Vector> vectors = square.getVectors();
-        if (vectors == null) {
-            return null;
-        }
-        ArrayList<Position> moves = new ArrayList<>();
-        for (Vector v : vectors) {
-            Position aux = v.getNextMove(position);
-
-            // Siempre que el vector siga avanzando, y la posición no sea ni menor a cero ni
-            // mayor al tablero
-            while (aux != null && (aux.getPosX() <= width && aux.getPosX() >= 0)
-                    && (aux.getPosY() <= height && aux.getPosY() >= 0)) {
-                moves.add(aux);
-                aux = v.getNextMove(aux);
-            }
-        }
-        return moves;
-
+        return square.getMovesOfPiece();
     }
 
     /* Permite mover una pieza a una posición */
