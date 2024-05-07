@@ -29,4 +29,9 @@ public class Position {
     public String toString() {
         return "(" + posX + ", " + posY + ")";
     }
+
+    public String toString(int add){
+        return "(" + (posX+add) + ", " + (posY+add) + ")";
+    }
+
 }

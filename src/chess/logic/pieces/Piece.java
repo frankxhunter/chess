@@ -12,7 +12,7 @@ public abstract class Piece {
     private Color color;
     private String[] simbology = null;
     private StatusBoard board;
-    private Position position;
+    private Position position = null;
     private ArrayList<Vector> vectors = new ArrayList<>();
     public Piece(Color color) {
 
@@ -31,8 +31,14 @@ public abstract class Piece {
     public Position getPosition() {
         return position;
     }
+
+    public void setInitialPosition(Position pos){
+        if(this.position == null)
+            this.position = pos;
+    }
     public void setPosition(Position position) {
-        this.position = position;
+        if(this.position != null)
+            this.position = position;
     }
 
     public Color getColor() {

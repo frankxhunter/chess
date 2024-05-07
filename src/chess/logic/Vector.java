@@ -2,7 +2,6 @@ package chess.logic;
 
 import java.util.Iterator;
 
-// TODO Convectir los vectores en una clase iterable
 public class Vector {
     private int posX, posY;
     private int magnitude= 0; 
@@ -34,6 +33,7 @@ public class Vector {
         public Position next(){
             if(hasNext()){
                lastPostion = lastPostion.increaseBy(posX, posY);
+               realizedMove++;
                return lastPostion;
             }
             return null;

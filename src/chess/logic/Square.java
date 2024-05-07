@@ -29,7 +29,7 @@ public class Square {
 
     @Override
     public String toString(){
-        return piece != null ? piece.toString(): "";
+        return piece != null ? piece.toString(): "🕳";
     }
 
     public Piece removePiece(){

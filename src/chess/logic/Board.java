@@ -30,16 +30,16 @@ public class Board implements StatusBoard{
     /* Esta función se utiliza para colocar las piezas del juego en el tablero */
     public void
     putPiece(Piece piece, Position pos) {
-        squareList.get(pos.getPosY()).get(pos.getPosX()).setPiece(piece);
+        getSquare(pos).setPiece(piece);
         piece.setBoard(this);
-        piece.setPosition(pos);
+        piece.setInitialPosition(pos);
     }
 
     public Color whoIsHere(Position pos){
         if(!hasPosition(pos)){
             return null;
         }
-        return squareList.get(pos.getPosX()).get(pos.getPosY()).colorPieceOccuped();
+        return getSquare(pos).colorPieceOccuped();
     }
 
     /* Esta función imprime en consola el tablero completo */
@@ -62,7 +62,7 @@ public class Board implements StatusBoard{
 
     /* Obtiene todos los movimientos de una pieza especifica */
     public ArrayList<Position> getMovesOfPiece(Position position) {
-        Square square = squareList.get(position.getPosX()).get(position.getPosY());
+        Square square = getSquare(position);
         return square.getMovesOfPiece();
     }
 
@@ -79,13 +79,20 @@ public class Board implements StatusBoard{
 
         // Si se encontró la posición entre los posibles movimientos, realizar el movimiento
         if (found) {
-            Piece piece = squareList.get(initialPosition.getPosX()).get(initialPosition.getPosY()).removePiece();
-            squareList.get(finalPosition.getPosX()).get(finalPosition.getPosY()).setPiece(piece);
+            Piece piece = getSquare(initialPosition).removePiece();
+            getSquare(finalPosition).setPiece(piece);
             piece.setPosition(finalPosition);
         }
         return found;
     }
     public boolean hasPosition(Position pos){
         return (pos.getPosX()>=0 && pos.getPosX() <width) && (pos.getPosY() >= 0 && pos.getPosY()<height);
+    }
+
+    public Piece getPiece(Position position) {
+        return squareList.get(position.getPosY()).get(position.getPosX()).getPiece();
+    }
+    public Square getSquare(Position position ){
+        return squareList.get(position.getPosY()).get(position.getPosX());
     }
 }
