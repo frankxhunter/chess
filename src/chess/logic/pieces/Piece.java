@@ -14,47 +14,50 @@ public abstract class Piece {
     private StatusBoard board;
     private Position position = null;
     private ArrayList<Vector> vectors = new ArrayList<>();
+
     public Piece(Color color) {
 
         this.color = color;
 
     }
 
-    public ArrayList<Vector> getVectors() {
-        return vectors;
-    }
-
-    public void setBoard(StatusBoard board) {
-        this.board = board;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setInitialPosition(Position pos){
-        if(this.position == null)
-            this.position = pos;
-    }
-    public void setPosition(Position position) {
-        if(this.position != null)
-            this.position = position;
-    }
-
-    public Color getColor() {
-        return color;
+    // GETTERS AND SETTERS
+    public void setSimbology(String[] simbology) {
+        this.simbology = simbology;
     }
 
     public String[] getSimbology() {
         return simbology;
     }
 
-    public void setSimbology(String[] simbology) {
-        this.simbology = simbology;
+    public Color getColor() {
+        return color;
+    }
+
+    public ArrayList<Vector> getVectors() { return vectors; }
+
+    public void setBoard(StatusBoard board) {
+        this.board = board;
     }
 
     public StatusBoard getBoard() {
         return board;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    // OTHER METHODS
+
+    public void setInitialPosition(Position pos){
+        if(this.position == null)
+            this.position = pos;
+    }
+
+    public void setPosition(Position position) {
+        if(this.position != null)
+            this.position = position;
     }
 
     public ArrayList<Position> getMoves() {
@@ -79,7 +82,6 @@ public abstract class Piece {
         return moves;
 
     }
-
 
     @Override
     public String toString() {

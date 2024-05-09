@@ -8,6 +8,8 @@ public class Square {
     private Position position; 
     private Piece piece;
 
+    // GETTERS AND SETTERS
+
     public Square(Position position, Piece piece) {
         this.piece = piece; 
         this.position = position;
@@ -25,7 +27,7 @@ public class Square {
         return position;
     }
 
-
+    // Other methods
 
     @Override
     public String toString(){

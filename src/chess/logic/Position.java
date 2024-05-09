@@ -21,6 +21,7 @@ public class Position {
             return true;
         return false;
     }
+
     public Position increaseBy(int movesX, int movesY){
         return new Position(posX + movesX, posY + movesY);
     }
@@ -30,6 +31,8 @@ public class Position {
         return "(" + posX + ", " + posY + ")";
     }
 
+    // Este metodo se utiliza para que devuelva la posicion aumentandole en un determinado valor
+    // Es util para que no comenzar a contar desde cero
     public String toString(int add){
         return "(" + (posX+add) + ", " + (posY+add) + ")";
     }

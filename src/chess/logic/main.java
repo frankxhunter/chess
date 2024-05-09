@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) {
-        Game chess = new Game(8, 8);
+        EngineChess chess = new EngineChess(8, 8);
         try(Scanner scan = new Scanner(System.in)){
 
             while (true) {

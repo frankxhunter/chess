@@ -3,13 +3,13 @@ package chess.logic;
 import java.util.Iterator;
 
 public class Vector {
-    private int posX, posY;
+    private int pointX, pointY;
     private int magnitude= 0; 
     private boolean largeMove; 
 
     public Vector(int posX, int posY, int magnitude, boolean largeMove) {
-        this.posX = posX;
-        this.posY = posY;
+        this.pointX = posX;
+        this.pointY = posY;
         this.largeMove = largeMove;
         if( magnitude >= 0){
             this.magnitude = magnitude;
@@ -32,7 +32,7 @@ public class Vector {
 
         public Position next(){
             if(hasNext()){
-               lastPostion = lastPostion.increaseBy(posX, posY);
+               lastPostion = lastPostion.increaseBy(pointX, pointY);
                realizedMove++;
                return lastPostion;
             }
