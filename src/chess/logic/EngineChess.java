@@ -74,6 +74,7 @@ public class EngineChess {
             throw new IlegalMoveException("This move is not allowed");
         }
         board.movePiece(initialPosition, finalPosition);
+        changeTurn();
         refreshCurrentMoves();
     }
 
@@ -88,4 +89,9 @@ public class EngineChess {
     public Piece getPiece(Position position) {
         return board.getPiece(position);
     }
+
+    private void changeTurn(){
+        turnPlayer = turnPlayer == Color.WHITE ? Color.BLACK : Color.WHITE;
+    }
 }
+

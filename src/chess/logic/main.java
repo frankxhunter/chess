@@ -1,5 +1,7 @@
 package chess.logic;
 
+import chess.logic.exceptions.IlegalMoveException;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -30,10 +32,10 @@ public class main {
                         }
                         System.out.println("Elige un movimiento(0-" + (i - 1) + "): ");
                         int moveSelected = scan.nextInt();
-                        boolean result = chess.movePiece(initialPosition, moves.get(moveSelected));
-                        if (result) {
+                        try{
+                            chess.doMove(initialPosition, moves.get(moveSelected));
                             System.out.println("El movimiento fue realizado con éxito");
-                        } else {
+                        }catch (IlegalMoveException e){
                             System.out.println("No es posible realizar dicho movimiento");
                         }
                     }else
