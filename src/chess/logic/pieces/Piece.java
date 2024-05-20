@@ -13,6 +13,7 @@ public abstract class Piece {
     private String[] simbology = null;
     private StatusBoard board;
     private Position position = null;
+    private boolean hasMoved = false;
     private ArrayList<Vector> vectors = new ArrayList<>();
 
     public Piece(Color color) {
@@ -46,6 +47,10 @@ public abstract class Piece {
 
     public Position getPosition() {
         return position;
+    }
+
+    public boolean isHasMoved() {
+        return hasMoved;
     }
 
     // OTHER METHODS
@@ -88,4 +93,11 @@ public abstract class Piece {
         return color == Color.WHITE ? simbology[0] : simbology[1];
     }
 
+    public void doMove(Position finalPosition) {
+        if(this.position != null) {
+            this.position = finalPosition;
+            hasMoved = true;
+
+        }
+    }
 }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 public class Pawn extends Piece {
     private boolean firstMove = false;
+    private boolean doubleStep = false;
     private ArrayList<Vector> vectorsToCapture = new ArrayList<>();
     public Pawn(Color color) {
         super(color);
@@ -72,6 +73,18 @@ public class Pawn extends Piece {
         }
 
         return moves;
+
+    }
+
+    @Override
+    public void doMove(Position finalPosition) {
+        if (getPosition().getPosY() - finalPosition.getPosY() == 2) {
+            doubleStep = true;
+        }
+        else{
+            doubleStep = false;
+        }
+        super.doMove(finalPosition);
 
     }
 }

@@ -110,14 +110,14 @@ public class Board implements StatusBoard {
          */
         Piece piece = getSquare(initialPosition).removePiece();
         getSquare(finalPosition).setPiece(piece);
-        piece.setPosition(finalPosition);
+        piece.doMove(finalPosition);
 
     }
 
 
     /* Esta función imprime en consola el tablero completo */
     public void printBoard() {
-        int i = 8;
+        int i = squareList.get(0).size();
         ListIterator<ArrayList<Square>> it = squareList.listIterator(squareList.size());
         System.out.println("  ______________________");
         while (it.hasPrevious()) {
@@ -138,5 +138,21 @@ public class Board implements StatusBoard {
 
     public Square getSquare(Position position) {
         return squareList.get(position.getPosY()).get(position.getPosX());
+    }
+
+    // Permite obtener todas las pieces de un tipo y un color en el tablero
+    public ArrayList<Piece> getPiecesByType(String type, Color color){
+        ArrayList<Piece> pieces = new ArrayList<>();
+        for (Piece p : piecesList){
+            if (p.getColor() == color && p.getClass().getName().contains(type)) {
+                pieces.add(p);
+            }
+        }
+        return pieces;
+    }
+    // Metodo para eliminar una pieza del tablero
+    public void deletePiece(Position position) {
+        Piece piece = this.squareList.get(position.getPosY()).get(position.getPosX()).removePiece();
+        piecesList.remove(piece);
     }
 }

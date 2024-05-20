@@ -1,9 +1,11 @@
 package test;
 
+import chess.logic.Color;
 import chess.logic.EngineChess;
 import chess.logic.Position;
 import chess.logic.pieces.chess.Knight;
 import chess.logic.pieces.chess.Pawn;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -13,7 +15,7 @@ class EngineChessTest {
     private EngineChess game;
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        game = new EngineChess(8, 8);
+        game = new EngineChess(8, 8, true);
     }
 
     @org.junit.jupiter.api.AfterEach
@@ -72,6 +74,8 @@ class EngineChessTest {
     void doMove() {
         // Se probaran diferentes movimientos de diferentes piezas
         game.printBoard();
+        game.getCurrentMoves().forEach(e -> System.out.println(e[0]+""+ e[1]));
+
         game.doMove(new Position(3,1), new Position(3, 3));
         assertTrue(game.getPiece(new Position(3, 3)) instanceof Pawn);
 
@@ -84,5 +88,24 @@ class EngineChessTest {
 
     }
 
+    // Probando el peon al paso
+    @Test
+    void checkEnPassant(){
+        game = new EngineChess(4,4, false);
+        game.setupPiece(new Pawn(Color.WHITE), new Position(1, 1));
+        game.setupPiece(new Pawn(Color.BLACK), new Position(2, 3));
+        game.doMove(new Position(1, 1), new Position(1, 3));
+
+        // Realizar movimiento de peon al paso
+        game.doMove(new Position(2, 3), new Position(1, 2));
+
+        assertNull(game.getPiece(new Position(1, 3)));
+        assertTrue(game.getPiece(new Position(1, 2)) instanceof Pawn);
+        //game.getCurrentMoves().forEach(e -> System.out.println(e[0]+""+ e[1]));
+        //game.printBoard();
+
+
+
+    }
 
 }
