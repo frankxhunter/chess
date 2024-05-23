@@ -10,10 +10,15 @@ public class King extends Piece {
     public King(Color color) {
         super(color);
         setSimbology(new String[]{"♚", "♔"});
-        getVectors().add(new Vector(0, 1 , 0 , true));
-        getVectors().add(new Vector(0, -1 , 0 , true));
-        getVectors().add(new Vector(1, 0 , 0 , true));
-        getVectors().add(new Vector(-1, 0 , 0 , true));
+        getVectors().add(new Vector(0, 1 , 1 , false));
+        getVectors().add(new Vector(0, -1 , 1 , false));
+        getVectors().add(new Vector(1, 0 , 1 , false));
+        getVectors().add(new Vector(-1, 0 , 1 , false));
+
+        getVectors().add(new Vector(1, 1 , 1 , false));
+        getVectors().add(new Vector(-1, -1 , 1 , false));
+        getVectors().add(new Vector(-1, 1 , 1 , false));
+        getVectors().add(new Vector(1, -1 , 1 , false));
 
     }
 

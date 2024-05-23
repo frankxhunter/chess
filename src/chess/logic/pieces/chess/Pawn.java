@@ -3,6 +3,7 @@ package chess.logic.pieces.chess;
 import chess.logic.Color;
 import chess.logic.Position;
 import chess.logic.Vector;
+import chess.logic.exceptions.IllegalPromoveException;
 import chess.logic.pieces.Piece;
 
 import java.util.ArrayList;
@@ -85,6 +86,29 @@ public class Pawn extends Piece {
             doubleStep = false;
         }
         super.doMove(finalPosition);
+
+    }
+    public Piece promove(String typeOfPiece) throws IllegalPromoveException {
+        Piece piece = null;
+        if(typeOfPiece == "Rook"){
+            piece = new Rook(this.getColor());
+        }
+        else if(typeOfPiece == "Bishop"){
+            piece = new Bishop(this.getColor());
+        }
+        else if(typeOfPiece == "Queen"){
+            piece = new Queen(this.getColor());
+        }
+        else if(typeOfPiece == "Knight"){
+            piece = new Knight(this.getColor());
+        }
+        else{
+            throw new IllegalPromoveException("Invalid piece for pawn promotion");
+        }
+
+        piece.setPosition(this.getPosition());
+        piece.setBoard(this.getBoard());
+        return piece;
 
     }
 }

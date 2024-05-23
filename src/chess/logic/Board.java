@@ -1,6 +1,8 @@
 package chess.logic;
 
+import chess.logic.exceptions.UnCommitMoveException;
 import chess.logic.pieces.Piece;
+import chess.logic.pieces.chess.Pawn;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +13,9 @@ public class Board implements StatusBoard {
     private ArrayList<Piece> piecesList = new ArrayList<>();
     private int height;
     private int width;
+
+    // Indica si hay un movimiento sin guardar
+    private UnCommitMove unCommitMove = null;
 
     public Board(int height, int width) {
         if (height > 0 || width > 0) {
@@ -30,8 +35,17 @@ public class Board implements StatusBoard {
 
     // GETTERS AND SETTERS
 
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
 
     // OTHER METHODS
+
 
     public Color whoIsHere(Position pos) {
         if (!hasPosition(pos)) {
@@ -46,10 +60,10 @@ public class Board implements StatusBoard {
 
     /* Esta función se utiliza para colocar las piezas del juego en el tablero */
     public void putPiece(Piece piece, Position pos) {
-        getSquare(pos).setPiece(piece);
+        this.getSquare(pos).setPiece(piece);
         piece.setBoard(this);
         piece.setInitialPosition(pos);
-        piecesList.add(piece);
+        this.piecesList.add(piece);
     }
 
     public ArrayList<Position[]> getMoves(){
@@ -74,6 +88,19 @@ public class Board implements StatusBoard {
         }
         return moves;
     }
+    public ArrayList<Position> getDangerSquares(Color color){
+        ArrayList<Position> squares = new ArrayList<>();
+        Iterator<Piece> it = piecesList.iterator();
+        while(it.hasNext()){
+            Piece piece = it.next();
+            if (piece.getColor() == color) {
+                for (Position pos: piece.getMoves()){
+                    squares.add(pos);
+                }
+            }
+        }
+        return squares;
+    }
 
 
 
@@ -84,7 +111,7 @@ public class Board implements StatusBoard {
     }
 
     /* Permite mover una pieza a una posición */
-    public void movePiece(Position initialPosition, Position finalPosition) {
+    public void movePiece(Position initialPosition, Position finalPosition) throws UnCommitMoveException {
         // Por ahora no se realizara validacion en este metodo, esto podria cambiar
 
 
@@ -108,12 +135,52 @@ public class Board implements StatusBoard {
 
 
          */
+        if(this.unCommitMove != null){
+            throw new UnCommitMoveException("There a uncommit move, you must a rollback or a commit");
+        }
         Piece piece = getSquare(initialPosition).removePiece();
+        Piece capturedPiece = getSquare(finalPosition).removePiece();
+
+        if(capturedPiece!=null){
+            this.piecesList.remove(capturedPiece);
+        }
         getSquare(finalPosition).setPiece(piece);
         piece.doMove(finalPosition);
 
     }
 
+    public void doUnCommitMove(Position initialPosition, Position finalPosition) throws UnCommitMoveException{
+        if(this.unCommitMove != null){
+          throw new UnCommitMoveException("There a uncommit move, you must a rollback or a commit");
+        }
+        Piece piece = getSquare(initialPosition).removePiece();
+        Piece capturedPiece = getSquare(finalPosition).removePiece();
+
+        if(capturedPiece!=null){
+            this.piecesList.remove(capturedPiece);
+        }
+        this.getSquare(finalPosition).setPiece(piece);
+        piece.setPosition(finalPosition);
+
+        this.unCommitMove = new UnCommitMove(initialPosition, finalPosition, capturedPiece);
+    }
+    public void rollBack(){
+        if(this.unCommitMove != null){
+            Piece piece = this.getSquare(this.unCommitMove.getFinalPosition()).removePiece();
+            piece.setPosition(this.unCommitMove.getInitialPosition());
+            this.getSquare(this.unCommitMove.getInitialPosition()).setPiece(piece);
+
+            if(this.unCommitMove.getCapturedPiece()!=null){
+                this.piecesList.add(this.unCommitMove.getCapturedPiece());
+                this.getSquare(this.unCommitMove.getFinalPosition()).setPiece(this.unCommitMove.getCapturedPiece());
+            }
+
+            this.unCommitMove = null;
+        }
+    }
+    public void commit(){
+        this.unCommitMove = null;
+    }
 
     /* Esta función imprime en consola el tablero completo */
     public void printBoard() {
@@ -150,9 +217,34 @@ public class Board implements StatusBoard {
         }
         return pieces;
     }
+    public Piece getPieceByType(String type, Color color){
+        Piece piece = null;
+        for (Piece p : piecesList){
+            if (p.getColor() == color && p.getClass().getName().contains(type)) {
+                piece= p;
+                break;
+            }
+        }
+        return piece;
+    }
     // Metodo para eliminar una pieza del tablero
     public void deletePiece(Position position) {
         Piece piece = this.squareList.get(position.getPosY()).get(position.getPosX()).removePiece();
         piecesList.remove(piece);
     }
+
+    // Este metodo sirve para cambiar una piece por otra
+    public void changePiece(Piece piece) {
+        if(piece.getPosition()!= null && this.hasPosition(piece.getPosition())){
+
+            Square square = this.getSquare(piece.getPosition());
+            Piece removed = square.removePiece();
+            square.setPiece(piece);
+            this.piecesList.remove(removed);
+            this.piecesList.add(piece);
+
+        }
+    }
+
+
 }

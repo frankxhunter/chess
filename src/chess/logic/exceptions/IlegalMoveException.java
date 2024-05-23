@@ -1,6 +1,6 @@
 package chess.logic.exceptions;
 
-public class IlegalMoveException extends RuntimeException{
+public class IlegalMoveException extends Exception{
     public IlegalMoveException(){
         super();
     }

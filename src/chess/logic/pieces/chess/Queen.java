@@ -15,7 +15,7 @@ public class Queen extends Piece {
 
         getVectors().add(new Vector(1 , 1, 0,true));
         getVectors().add(new Vector(1 , -1, 0,true));
-        getVectors().add(new Vector(-1 , 1, 0,true));
+        getVectors().add(new Vector(-1 ,  1, 0,true));
         getVectors().add(new Vector(-1 , -1, 0,true));
     }
 }

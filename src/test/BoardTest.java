@@ -1,9 +1,7 @@
 package test;
 
-import chess.logic.Board;
-import chess.logic.Color;
-import chess.logic.EngineChess;
-import chess.logic.Position;
+import chess.logic.*;
+import chess.logic.exceptions.UnCommitMoveException;
 import chess.logic.pieces.Piece;
 import chess.logic.pieces.chess.*;
 import org.junit.jupiter.api.AfterEach;
@@ -58,6 +56,26 @@ class BoardTest {
         for (Piece p :
                 pawns) {
             assertTrue(p instanceof Pawn);
+        }
+    }
+    @Test
+    public void unCommitMove(){
+        try {
+            board.movePiece(new Position(4, 1), new Position(4, 3));
+            board.movePiece(new Position(5, 6), new Position(5, 4));
+            board.printBoard();
+
+            board.doUnCommitMove(new Position(4, 3),new Position(5, 4));
+            //assertThrows(UnCommitMoveException.class, ()->{
+            //    board.movePiece(new Position(4, 1), new Position(4, 3));
+            //});
+            board.printBoard();
+            board.rollBack();
+            board.printBoard();
+        }catch (UnCommitMoveException e){
+            e.printStackTrace();
+            fail("No deberia saltar ninguna exception");
+
         }
     }
 }

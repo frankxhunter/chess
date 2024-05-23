@@ -37,7 +37,9 @@ public class main {
                             System.out.println("El movimiento fue realizado con éxito");
                         }catch (IlegalMoveException e){
                             System.out.println("No es posible realizar dicho movimiento");
-                        }
+                        }catch(Exception e){
+                        e.printStackTrace();
+                    }
                     }else
                         System.out.println("La pieza seleccionada no tiene movimientos");
                 }else{

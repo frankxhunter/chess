@@ -1,8 +1,12 @@
 package chess.logic;
 
 import chess.logic.exceptions.IlegalMoveException;
+import chess.logic.exceptions.IllegalPromoveException;
+import chess.logic.exceptions.PendingPromoveException;
+import chess.logic.exceptions.UnCommitMoveException;
 import chess.logic.pieces.Piece;
 import chess.logic.pieces.chess.*;
+import chess.logic.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,13 +17,17 @@ public class EngineChess {
     private ArrayList<Position[]> currentMoves;
     private Position [] lastMove=new Position[2];
 
+    //Indica si actualmente el rey esta en jaque
+    private boolean kingInCheck= false;
+
+    private ArrayList<Position> dangerSquares;
 
     //Variables para los movimientos especiales
     private ArrayList<Position[]> enPassant;
     private ArrayList<Position[]> castle;
 
-    
-
+    //Variable que indica si hay un peon coronable
+    private Piece pawnReadyToPromove = null;
 
     public EngineChess(int height, int width, boolean setup) {
         this.board = new Board(height, width);
@@ -68,10 +76,14 @@ public class EngineChess {
     // TODO terminar metodo
     private void refreshCurrentMoves() {
         this.currentMoves = board.getMoves(turnPlayer);
+        this.dangerSquares = board.getDangerSquares(Utils.changeColor(turnPlayer));
+        this.kingInCheck = isKingInCheck();
         checkEnPassant();
         checkCastle();
         this.currentMoves.addAll(enPassant);
         this.currentMoves.addAll(castle);
+
+        this.validateLegalMovesConsideringCheck();
 
 
 
@@ -80,7 +92,12 @@ public class EngineChess {
         // Revisar cuales no se pueden hacer pq provocan autojacke
     }
 
-    public void doMove(Position initialPosition, Position finalPosition) throws IlegalMoveException{
+    public void doMove(Position initialPosition, Position finalPosition)
+            throws IlegalMoveException,PendingPromoveException, UnCommitMoveException {
+        // Lo primero es revisar si hay un peon listo para coronar, si es asi, se debe hacer esto primero
+        if (pawnReadyToPromove != null) {
+            throw new PendingPromoveException("There is a pawn awating promotion");
+        }
         if(!hasThisMove(initialPosition, finalPosition, this.currentMoves)){
             throw new IlegalMoveException("This move is not allowed");
         }
@@ -95,13 +112,17 @@ public class EngineChess {
             // Realizar el movimiento normal
             board.movePiece(initialPosition, finalPosition);
         }
-        // Cambiar de turno, actualizar el ultimo movimiento, la lista de movimientos posibles
-        changeTurn();
+        // Actualizar el ultimo movimiento
 
         lastMove[0] = initialPosition;
         lastMove[1] = finalPosition;
 
-        refreshCurrentMoves();
+        // Revisar si el ultimo movimiento fue un peon coronado
+        // Si no ya puedes cambiar de turno y actualizar la lista de movimientos
+        if (!checkPawnIsPendingToPromove()) {
+            changeTurn();
+            refreshCurrentMoves();
+        }
 
 
 
@@ -113,7 +134,7 @@ public class EngineChess {
         Iterator<Position[]> it = moves.iterator();
         while(it.hasNext() && !found){
             Position [] move = it.next();
-            if(move[0].isEqual(initialPosition) && move[1].isEqual(finalPosition) ){
+            if(move[0].equals(initialPosition) && move[1].equals(finalPosition) ){
                 found = true;
             }
         }
@@ -121,9 +142,14 @@ public class EngineChess {
         return found;
     }
 
-
     public ArrayList<Position> getMovesOfPiece(Position position) {
-        return board.getMovesOfPiece(position);
+        ArrayList<Position> finalsPositions = new ArrayList<>();
+        for (Position [] p : this.currentMoves){
+            if (p[0].equals(position)){
+                finalsPositions.add(p[1]);
+            }
+        }
+        return finalsPositions;
     }
 
     public Piece getPiece(Position position) {
@@ -134,6 +160,32 @@ public class EngineChess {
         turnPlayer = turnPlayer == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
 
+    private boolean isKingInCheck() {
+        //Comprueba que el rey si el rey esta en jacke y actualiza la jugada correspondiente
+        boolean kingInCheck = false;
+        Piece king = this.board.getPieceByType("King", turnPlayer);
+        if(king != null && board.getDangerSquares(Utils.changeColor(turnPlayer)).contains(king.getPosition())){
+            kingInCheck = true;
+        }
+        return kingInCheck;
+
+    }
+    // Metodo que valida la lista de movimientos actuales para descartar las q ponen al rey en jaque
+    private void validateLegalMovesConsideringCheck() {
+        ArrayList<Position[]> legalMoves = new ArrayList<>();
+        for(Position[] positions : this.currentMoves){
+            try {
+                this.board.doUnCommitMove(positions[0], positions[1]);
+                if(!isKingInCheck()){
+                    legalMoves.add(positions);
+                }
+                this.board.rollBack();
+            }catch(UnCommitMoveException exception){
+                exception.printStackTrace();
+            }
+        }
+        this.currentMoves = legalMoves;
+    }
     /////////////////////////////////////////////////////////////////////////////////////////
     // Estos metodos son los que detectan los movimientos especiales
 
@@ -172,7 +224,7 @@ public class EngineChess {
     }
 
     // Metodo para realizar el movimiento de peon al paso
-    private void doEnPassant(Position initialPosition, Position finalPosition) {
+    private void doEnPassant(Position initialPosition, Position finalPosition) throws UnCommitMoveException {
         this.board.movePiece(initialPosition, finalPosition);
         // Eliminar el peon que esta en la ultima posicion
         this.board.deletePiece(this.lastMove[1]);
@@ -188,50 +240,56 @@ public class EngineChess {
      */
     private void checkCastle(){
         this.castle = new ArrayList<>();
-        Piece king = this.board.getPiecesByType("King", turnPlayer).get(0);
-        // TODO Comprobar que el rey no esta en jaque
-        if(!king.isHasMoved()){
-            ArrayList<Piece> rooks = this.board.getPiecesByType("Rooks", turnPlayer );
-            for (Piece rook: rooks){
-                // Calculo las casillas de diferencia que hay entre el rey y la torre en el eje X
-                int intermediareSquares = Math.abs(king.getPosition().getPosX() - rook.getPosition().getPosX());
+            Piece king = this.board.getPieceByType("King", turnPlayer);;
+            // Se comprueba que el rey no se haya movido y que no este en jaque
+            if (king != null && !king.isHasMoved() && !this.kingInCheck) {
+                ArrayList<Piece> rooks = this.board.getPiecesByType("Rook", turnPlayer);
+                for (Piece rook : rooks) {
+                    // Calculo las casillas de diferencia que hay entre el rey y la torre en el eje X
+                    int intermediareSquares = Math.abs(king.getPosition().getPosX() - rook.getPosition().getPosX() )-1;
 
-                // Compruebo que la torre no se ha movido y que el rey y la torre esten a la misma altura y
-                // que haya 2 o mas casillas de diferencia
-                if (!rook.isHasMoved() &&
-                        king.getPosition().getPosY() == rook.getPosition().getPosY()
-                        && intermediareSquares >= 2) {
-                    // Calculo el punto donde debera ir el rey
-                    int kingMoveDistance = intermediareSquares % 2 == 0 ?
-                            intermediareSquares / 2: (intermediareSquares /2) +1;
-                    // Ahora debo iterar desde la posicion del rey hasta la posicion la torre
-                    int kingDirection = king.getPosition().getPosX() - rook.getPosition().getPosX() < 0? 1: -1;
-                    Position temporalPosition = king.getPosition();
-                    boolean conditions = true;
-                    for (int i = 0; i< intermediareSquares && conditions; i++){
-                        temporalPosition.increaseBy(kingDirection,0);
+                    // Compruebo que la torre no se ha movido y que el rey y la torre esten a la misma altura y
+                    // que haya 2 o mas casillas de diferencia
+                    if (!rook.isHasMoved() &&
+                            king.getPosition().getPosY() == rook.getPosition().getPosY()
+                            && intermediareSquares >= 2) {
+                        // Calculo el punto donde debera ir el rey
+                        int kingMoveDistance =  (intermediareSquares / 2) + 1;
+                        // Ahora debo iterar desde la posicion del rey hasta la posicion la torre
+                        int kingDirection = king.getPosition().getPosX() < rook.getPosition().getPosX() ? 1 : -1;
+                        Position temporalPosition = king.getPosition();
+                        boolean conditions = true;
+                        for (int i = 0; i < intermediareSquares && conditions; i++) {
+                            temporalPosition = temporalPosition.increaseBy(kingDirection, 0);
 
-                        // TODO comprobar que la casillas hasta donde avanza el rey no esten amenazadas,
-                        // creo que esto se puede hacer obteniendo los proximos movimientos del rival
-                        if (this.board.getPiece(temporalPosition) != null){
-                            conditions= false;
+
+                            Piece temporalPiece = this.getPiece(temporalPosition);
+                            if (temporalPiece != null) {
+                                conditions = false;
+
+                            // Se comprueba q ninguna de las casillas por las que pasa el rey estan amenazadas
+                            }else if( i < kingMoveDistance && dangerSquares.contains(temporalPosition)){
+                                conditions = false;
+                            }
                         }
-                    }
-                    // Si se cumplieron las condiciones se agrega el movimiento a las lista de enroque
-                    this.castle.add(new Position[]
-                            {king.getPosition(),
-                                    king.getPosition().increaseBy(kingDirection * kingMoveDistance, 0)});
+                        // Si se cumplieron las condiciones se agrega el movimiento a las lista de enroque
+                        if(conditions){
+                            this.castle.add(new Position[]
+                                    {king.getPosition(),
+                                            king.getPosition().increaseBy(kingDirection * kingMoveDistance, 0)});
+                        }
 
+                    }
                 }
             }
-        }
+
     }
 
-    private void doCastle(Position initialPosition, Position finalPosition) {
+    private void doCastle(Position initialPosition, Position finalPosition) throws UnCommitMoveException{
         this.board.movePiece(initialPosition, finalPosition);
         // Buscar cual es la torre que le corresponde
         boolean found = false;
-        int searchDirecion = initialPosition.getPosX() < initialPosition.getPosX() ? 1: -1;
+        int searchDirecion = initialPosition.getPosX() < finalPosition.getPosX() ? 1: -1;
         Position currentPosition = finalPosition;
         while( !found ){
             currentPosition = currentPosition.increaseBy(searchDirecion, 0);
@@ -240,6 +298,30 @@ public class EngineChess {
             }
         }
         this.board.movePiece(currentPosition, finalPosition.increaseBy(searchDirecion*(-1),0));
+
+    }
+
+    // Metodo para revisar si hay un peon pendiente de coronar
+    private boolean checkPawnIsPendingToPromove() {
+         // La revision se basara en el ultimo movimiento, por tanto debe estar actualizado
+        Piece piece = this.getPiece(lastMove[1]);
+        if(piece instanceof Pawn){
+            int heightBoard = this.board.getHeight();
+            int positionY = piece.getPosition().getPosY();
+            if(positionY == 0 || positionY == heightBoard -1){
+                this.pawnReadyToPromove = piece;
+            }
+        }
+        return this.pawnReadyToPromove != null;
+    }
+
+    public void promovePawn(String typePiece) throws IllegalPromoveException {
+        Piece piecePromoved = ((Pawn)pawnReadyToPromove).promove(typePiece);
+        this.board.changePiece(piecePromoved);
+        this.pawnReadyToPromove = null;
+
+        changeTurn();
+        refreshCurrentMoves();
 
     }
 

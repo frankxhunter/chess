@@ -4,7 +4,13 @@ import chess.logic.Color;
 import chess.logic.Position;
 import chess.logic.StatusBoard;
 import chess.logic.Vector;
+import chess.logic.pieces.chess.Bishop;
+import chess.logic.pieces.chess.Knight;
+import chess.logic.pieces.chess.Rook;
+import chess.logic.utils.Utils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -61,7 +67,7 @@ public abstract class Piece {
     }
 
     public void setPosition(Position position) {
-        if(this.position != null)
+        if(position != null)
             this.position = position;
     }
 
@@ -78,6 +84,9 @@ public abstract class Piece {
                         && this.getBoard().whoIsHere(nextPosition) != this.getColor()){
 
                     moves.add(nextPosition);
+                    if (this.getBoard().whoIsHere(nextPosition) == Utils.changeColor(this.getColor())) {
+                        condition = false;
+                    }
                 }else{
                     condition= false;
                 }
@@ -100,4 +109,6 @@ public abstract class Piece {
 
         }
     }
+
+
 }

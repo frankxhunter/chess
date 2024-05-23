@@ -3,8 +3,10 @@ package test;
 import chess.logic.Color;
 import chess.logic.EngineChess;
 import chess.logic.Position;
-import chess.logic.pieces.chess.Knight;
-import chess.logic.pieces.chess.Pawn;
+import chess.logic.exceptions.IlegalMoveException;
+import chess.logic.exceptions.IllegalPromoveException;
+import chess.logic.exceptions.PendingPromoveException;
+import chess.logic.pieces.chess.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -15,7 +17,6 @@ class EngineChessTest {
     private EngineChess game;
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        game = new EngineChess(8, 8, true);
     }
 
     @org.junit.jupiter.api.AfterEach
@@ -26,6 +27,8 @@ class EngineChessTest {
 
     @org.junit.jupiter.api.Test
     void getCurrentMoves() {
+        game = new EngineChess(8, 8, true);
+
         ArrayList<Position[]> positionsList = new ArrayList<>();
 
 
@@ -61,7 +64,7 @@ class EngineChessTest {
             boolean found = false;
             for (int i=0 ; i< game.getCurrentMoves().size() && !found; i++){
                 Position[] temporalPosition = game.getCurrentMoves().get(i);
-                if( positions[0].isEqual(temporalPosition[0]) && positions[1].isEqual(temporalPosition[1])){
+                if( positions[0].equals(temporalPosition[0]) && positions[1].equals(temporalPosition[1])){
                     found = true;
                 }
             }
@@ -72,9 +75,11 @@ class EngineChessTest {
 
     @org.junit.jupiter.api.Test
     void doMove() {
+        try{
         // Se probaran diferentes movimientos de diferentes piezas
-        game.printBoard();
-        game.getCurrentMoves().forEach(e -> System.out.println(e[0]+""+ e[1]));
+        game = new EngineChess(8, 8, true);
+        //game.printBoard();
+        //game.getCurrentMoves().forEach(e -> System.out.println(e[0]+""+ e[1]));
 
         game.doMove(new Position(3,1), new Position(3, 3));
         assertTrue(game.getPiece(new Position(3, 3)) instanceof Pawn);
@@ -84,28 +89,115 @@ class EngineChessTest {
 
         game.doMove(new Position(6,0), new Position(5, 2));
         assertTrue(game.getPiece(new Position(5, 2)) instanceof Knight);
-        game.printBoard();
-
+        //game.printBoard();
+    }catch(Exception e){
+        e.printStackTrace();
+        fail("No deberia saltar ninguna exception");
+    }
     }
 
     // Probando el peon al paso
     @Test
     void checkEnPassant(){
         game = new EngineChess(4,4, false);
-        game.setupPiece(new Pawn(Color.WHITE), new Position(1, 1));
-        game.setupPiece(new Pawn(Color.BLACK), new Position(2, 3));
-        game.doMove(new Position(1, 1), new Position(1, 3));
+        try {
+            game.setupPiece(new Pawn(Color.WHITE), new Position(1, 1));
+            game.setupPiece(new Pawn(Color.BLACK), new Position(2, 3));
+            game.doMove(new Position(1, 1), new Position(1, 3));
 
-        // Realizar movimiento de peon al paso
-        game.doMove(new Position(2, 3), new Position(1, 2));
+            // Realizar movimiento de peon al paso
+            game.doMove(new Position(2, 3), new Position(1, 2));
 
-        assertNull(game.getPiece(new Position(1, 3)));
-        assertTrue(game.getPiece(new Position(1, 2)) instanceof Pawn);
+            assertNull(game.getPiece(new Position(1, 3)));
+            assertTrue(game.getPiece(new Position(1, 2)) instanceof Pawn);
+        }catch(Exception e){
+            e.printStackTrace();
+
+            fail("No deberia saltar ninguna exception");
+            }
         //game.getCurrentMoves().forEach(e -> System.out.println(e[0]+""+ e[1]));
+        //game.printBoard();
+    }
+
+    // Probando el enroque
+    @Test
+    void checkCastle(){
+        game = new EngineChess(8,8, false);
+        game.setupPiece(new King(Color.WHITE), new Position(3, 0));
+        game.setupPiece(new Rook(Color.WHITE), new Position(7,0));
+        game.setupPiece(new Queen(Color.BLACK), new Position(4, 7));
+        game.setupPiece(new Rook(Color.WHITE), new Position(0,0));
+
+       // game.printBoard();
+       // game.getMovesOfPiece(new Position(3,0)).forEach(e -> System.out.println(e.toString(1)));
+
+        // Comprobar que es posible hacer los moviemientos de enroque
+        assertFalse(hasThisMove(game.getMovesOfPiece(new Position(3, 0)), new Position(5, 0)));
+        assertTrue(hasThisMove(game.getMovesOfPiece(new Position(3, 0)), new Position(1, 0)));
+
+        // Comprobar q el movimiento funciona
+        assertThrows(IlegalMoveException.class, ()-> {
+            game.doMove(new Position(3, 0), new Position(5, 0) );
+        });
+        try{
+            game.doMove(new Position(3, 0), new Position(1, 0) );
+        }catch (Exception e) {
+            fail("Este movimiento deberia estar permitido");
+        }
         //game.printBoard();
 
 
 
+
+    }
+
+    // Este test comprueba la funcionalidad de coronacion del peon
+    @Test
+    void promovedPawn(){
+        game = new EngineChess(8,8, false);
+        game.setupPiece(new King(Color.BLACK), new Position(3, 0));
+        game.setupPiece(new Pawn(Color.WHITE), new Position(3, 6));
+        try{
+            game.doMove(new Position(3, 6), new Position(3, 7));
+        }catch(Exception e){
+        e.printStackTrace();
+        fail("No deberia saltar ninguna exception");
+        }
+        assertThrows(PendingPromoveException.class, ()->{
+            game.doMove(new Position(3, 0), new Position(3, 1));
+        });
+        try{
+        game.promovePawn("Knight");
+        }catch(IllegalPromoveException e){
+            e.printStackTrace();
+            fail("The promotion is correct, but something fail");
+        }
+        game.printBoard();
+
+    }
+    // Aqui se prueba si los movimientos permitidos son legales, y no provocan un jacke propio
+    @Test
+    void legalMoves(){
+        game = new EngineChess(8,8,false);
+        game.setupPiece(new King(Color.WHITE), new Position(3, 0));
+        game.setupPiece(new Knight(Color.WHITE), new Position(3, 1));
+        //game.setupPiece(new Rook(Color.BLACK), new Position(3, 7));
+        game.setupPiece(new Rook(Color.BLACK), new Position(4, 7));
+        game.setupPiece(new Bishop(Color.BLACK), new Position(6, 3));
+
+        game.printBoard();
+        game.getCurrentMoves().forEach(e -> System.out.println(e[0].toString(1)+""+e[1].toString(1)));
+    }
+
+    public boolean hasThisMove(ArrayList<Position> moves, Position move){
+        boolean found = false;
+        for (Position m: moves){
+            if(m.equals(move)){
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
 }
