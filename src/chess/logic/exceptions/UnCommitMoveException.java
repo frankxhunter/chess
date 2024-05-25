@@ -1,10 +1,11 @@
 package chess.logic.exceptions;
 
-public class UnCommitMoveException extends Exception{
-    public UnCommitMoveException(){
+public class UnCommitMoveException extends Exception {
+    public UnCommitMoveException() {
         super();
     }
-    public UnCommitMoveException(String message){
+
+    public UnCommitMoveException(String message) {
         super(message);
     }
 }

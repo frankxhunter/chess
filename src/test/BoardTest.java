@@ -1,20 +1,22 @@
 package test;
 
-import chess.logic.*;
+import chess.logic.board.Board;
+import chess.logic.board.Piece;
+import chess.logic.board.utils.Color;
+import chess.logic.board.utils.Position;
+import chess.logic.boardChess.pieces.*;
 import chess.logic.exceptions.UnCommitMoveException;
-import chess.logic.pieces.Piece;
-import chess.logic.pieces.chess.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 class BoardTest {
     private Board board;
+
     @BeforeEach
     void setUp() {
         board = new Board(8, 8);
@@ -41,15 +43,15 @@ class BoardTest {
         for (int i = 0; i < 8; i++)
             board.putPiece(new Pawn(Color.BLACK), new Position(i, 6));
     }
-    
+
     @AfterEach
     void tearDown() {
         board = null;
 
     }
-    
+
     @Test
-    void getPiecesByType(){
+    void getPiecesByType() {
         ArrayList<Piece> pawns = board.getPiecesByType("Pawn", Color.BLACK);
         assertEquals(pawns.size(), 8);
 
@@ -58,21 +60,22 @@ class BoardTest {
             assertTrue(p instanceof Pawn);
         }
     }
+
     @Test
-    public void unCommitMove(){
+    public void unCommitMove() {
         try {
             board.movePiece(new Position(4, 1), new Position(4, 3));
             board.movePiece(new Position(5, 6), new Position(5, 4));
             board.printBoard();
 
-            board.doUnCommitMove(new Position(4, 3),new Position(5, 4));
+            board.doUnCommitMove(new Position(4, 3), new Position(5, 4));
             //assertThrows(UnCommitMoveException.class, ()->{
             //    board.movePiece(new Position(4, 1), new Position(4, 3));
             //});
             board.printBoard();
             board.rollBack();
             board.printBoard();
-        }catch (UnCommitMoveException e){
+        } catch (UnCommitMoveException e) {
             e.printStackTrace();
             fail("No deberia saltar ninguna exception");
 
