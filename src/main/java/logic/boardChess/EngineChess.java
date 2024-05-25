@@ -19,6 +19,15 @@ public class EngineChess implements EngineWithPromove {
     private Board board;
     private Color turnPlayer;
 
+    public int getWidthBoard(){
+        return this.board.getWidth();
+    }
+    public int getHeightBoard(){
+        return this.board.getHeight();
+    }
+    public ArrayList<Piece> getPieces(){
+        return this.board.getPieces();
+    }
     //Indica si actualmente el rey esta en jaque
     private boolean kingInCheck = false;
 

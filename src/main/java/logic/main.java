@@ -1,8 +1,10 @@
-package chess.logic;
+package logic;
 
-import chess.logic.board.utils.Position;
-import chess.logic.boardChess.EngineChess;
-import chess.logic.exceptions.IllegalMoveException;
+
+
+import logic.board.utils.Position;
+import logic.boardChess.EngineChess;
+import logic.exceptions.IllegalMoveException;
 
 import java.util.ArrayList;
 import java.util.Scanner;

@@ -11,6 +11,10 @@ public interface Engine {
     ArrayList<Position[]> getCurrentMoves();
     void doMove(Position initialPosition, Position finalPosition) throws IllegalMoveException;
     ArrayList<Position> getMovesOfPiece(Position position);
+    ArrayList<Piece> getPieces();
     Piece getPiece(Position position);
+
+    int getWidthBoard();
+    int getHeightBoard();
 
 }

@@ -46,6 +46,11 @@ public class Board implements StatusBoard {
         return width;
     }
 
+    public ArrayList<Piece> getPieces() {
+        return this.piecesList;
+    }
+
+
 
     // OTHER METHODS
 

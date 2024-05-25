@@ -55,6 +55,7 @@ class BoardTest {
         for (Piece p :
                 pawns) {
             assertTrue(p instanceof Pawn);
+            System.out.println(p.getClass().getSimpleName());
         }
     }
 
