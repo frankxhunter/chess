@@ -1,71 +1,82 @@
 package logic.boardChess;
 
 import logic.board.EngineWithPromove;
-import logic.board.Piece;
+import logic.board.utils.Color;
+import logic.board.utils.Position;
 import logic.board.utils.StateGame;
+import logic.exceptions.IllegalMoveException;
+import logic.tools.translators.JsonTranslator;
+import logic.tools.translators.Translator;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class GameChessManager {
 
-    private EngineWithPromove engineGame;
+    public EngineChessInterface engineGame;
 
-    private StateGame stateGame;
+    public StateGame stateGame;
+
+    public Translator translator = new JsonTranslator();
 
     // TODO hacer el controlador del tiempo
-    // private Cronometro
+    //Cronometro
 
     public GameChessManager(){
         this.engineGame = new EngineChess(8, 8, true);
-        this.stateGame = StateGame.IN_PROCCESS;
+        refreshStateGame();
     }
-
-
 
     public String statusGame(){
-        JSONObject gameJson = new JSONObject();
-
-        //Establecer el largo y el ancho del tablero
-        gameJson.put("width", this.engineGame.getWidthBoard());
-        gameJson.put("height", this.engineGame.getHeightBoard());
-
-        //Establece el estado actual del juego
-        gameJson.put("statusGame", this.stateGame);
-
-        //Establecer la piezas con su posicion respectiva
-        JSONObject piecesJson[] = this.getPiecesJson();
-        gameJson.put("pieces", piecesJson);
-        return gameJson.toString();
+    return this.translator.statusGameTranslator(this.engineGame.getWidthBoard(),
+            this.engineGame.getHeightBoard(), this.engineGame.getPieces());
     }
 
-    private JSONObject[]  getPiecesJson() {
-        ArrayList<Piece> listPieces = this.engineGame.getPieces();
-        JSONObject piecesJson []= new JSONObject[listPieces.size()];
-        for (int i = 0; i < piecesJson.length; i++) {
-            piecesJson[i] = this.getPieceJson(listPieces.get(i));
+    public String currentMoves(){
+       return this.translator.currentMovesTranslator(this.engineGame.getCurrentMoves(), this.engineGame.getTurnPlayer());
+    }
+
+    public String doMove(String moveData){
+        JSONObject result = new JSONObject();
+        try {
+            Position[] move = this.translator.moveTranslatorToString(moveData);
+            this.engineGame.doMove(move[0], move[1]);
+            refreshStateGame();
+
+            // All data is correct
+            result.put("correct", true);
+        }catch (JSONException e){
+            // Error en el formato de entrada
+            result.put("correct", false);
+            result.put("Error", "The formatter is incorrect: " + e.getMessage());
+        } catch (IllegalMoveException e) {
+            // Error en la informacion enviada
+            result.put("correct", false);
+            result.put("Error",  e.getMessage());
         }
-        return piecesJson;
-    }
 
-    private JSONObject getPieceJson(Piece piece) {
-        JSONObject pieceJson = new JSONObject();
-        pieceJson.put("type", piece.getClass().getSimpleName());
-        pieceJson.put("color", piece.getColor());
-        pieceJson.put("x", piece.getPosition().getPosX());
-        pieceJson.put("y", piece.getPosition().getPosY());
-        return pieceJson;
-    }
-
-
-    public String currentMove(){
-        return "";
-    }
-    public String doMove(String move){
-        return "";
+        return result.toString(2);
     }
 
     private void refreshStateGame(){
-        // TODO
+        ArrayList<Position[]> currentMoves = this.engineGame.getCurrentMoves();
+        Color turnPlayer = this.engineGame.getTurnPlayer();
+
+        if(currentMoves.size() > 0){
+            stateGame = StateGame.IN_PROCCESS;
+        }
+        else if(!this.engineGame.isKingInCheck()){
+            stateGame = StateGame.DRAW;
+        }
+        else if(currentMoves.size()==0){
+            if(turnPlayer == Color.BLACK){
+                stateGame = StateGame.WHITE_WIN;
+            }
+            else{
+                stateGame = StateGame.BLACK_WIN;
+            }
+        }
+
     }
 }

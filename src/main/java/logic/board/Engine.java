@@ -1,6 +1,7 @@
 package logic.board;
 
 
+import logic.board.utils.Color;
 import logic.board.utils.Position;
 import logic.exceptions.IllegalMoveException;
 
@@ -17,4 +18,5 @@ public interface Engine {
     int getWidthBoard();
     int getHeightBoard();
 
+    Color getTurnPlayer();
 }

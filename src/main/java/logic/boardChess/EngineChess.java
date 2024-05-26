@@ -2,7 +2,6 @@ package logic.boardChess;
 
 
 import logic.board.Board;
-import logic.board.EngineWithPromove;
 import logic.board.Piece;
 import logic.board.utils.Color;
 import logic.board.utils.Position;
@@ -15,7 +14,7 @@ import logic.tools.Tools;
 
 import java.util.ArrayList;
 
-public class EngineChess implements EngineWithPromove {
+public class EngineChess implements EngineChessInterface {
     private Board board;
     private Color turnPlayer;
 
@@ -28,6 +27,15 @@ public class EngineChess implements EngineWithPromove {
     public ArrayList<Piece> getPieces(){
         return this.board.getPieces();
     }
+
+    public Color getTurnPlayer() {
+        return turnPlayer;
+    }
+
+    public boolean isKingInCheck() {
+        return kingInCheck;
+    }
+
     //Indica si actualmente el rey esta en jaque
     private boolean kingInCheck = false;
 
@@ -42,7 +50,6 @@ public class EngineChess implements EngineWithPromove {
 
     //Variable que indica si hay un peon coronable
     private Piece pawnReadyToPromove = null;
-
 
     public EngineChess(int height, int width, boolean setup) {
         this.board = new Board(height, width);
@@ -92,7 +99,7 @@ public class EngineChess implements EngineWithPromove {
     private void refreshCurrentMoves() {
         this.currentMoves = board.getMoves(turnPlayer);
         this.dangerSquares = board.getDangerSquares(Tools.changeColor(turnPlayer));
-        this.kingInCheck = isKingInCheck();
+        this.kingInCheck = calculateIsKingInCheck();
         checkEnPassant();
         checkCastle();
         this.currentMoves.addAll(enPassant);
@@ -162,8 +169,8 @@ public class EngineChess implements EngineWithPromove {
         turnPlayer = turnPlayer == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
 
-    private boolean isKingInCheck() {
-        //Comprueba que el rey si el rey esta en jacke y actualiza la jugada correspondiente
+    private boolean calculateIsKingInCheck() {
+        //Comprueba si el rey esta en jacke y actualiza la jugada correspondiente
         boolean kingInCheck = false;
         Piece king = this.board.getPieceByType("King", turnPlayer);
         if (king != null && board.getDangerSquares(Tools.changeColor(turnPlayer)).contains(king.getPosition())) {
@@ -179,7 +186,7 @@ public class EngineChess implements EngineWithPromove {
         for (Position[] positions : this.currentMoves) {
             try {
                 this.board.doUnCommitMove(positions[0], positions[1]);
-                if (!isKingInCheck()) {
+                if (!calculateIsKingInCheck()) {
                     legalMoves.add(positions);
                 }
                 this.board.rollBack();
