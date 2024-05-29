@@ -70,19 +70,19 @@ public class Pawn extends Piece {
 
     public Piece promove(String typeOfPiece) throws IllegalPromoveException {
         Piece piece = null;
-        if (typeOfPiece == "Rook") {
+        if (typeOfPiece.equalsIgnoreCase("Rook") ){
             piece = new Rook(this.getColor());
-        } else if (typeOfPiece == "Bishop") {
+        } else if (typeOfPiece.equalsIgnoreCase("Bishop")) {
             piece = new Bishop(this.getColor());
-        } else if (typeOfPiece == "Queen") {
+        } else if (typeOfPiece.equalsIgnoreCase("Queen")) {
             piece = new Queen(this.getColor());
-        } else if (typeOfPiece == "Knight") {
+        } else if (typeOfPiece.equalsIgnoreCase("Knight")) {
             piece = new Knight(this.getColor());
         } else {
             throw new IllegalPromoveException("Invalid piece for pawn promotion");
         }
 
-        piece.doMove(this.getPosition());
+        piece.setPosition(this.getPosition());
         piece.setBoard(this.getBoard());
         return piece;
 

@@ -97,24 +97,24 @@ public class EngineChess implements EngineChessInterface {
     }
 
     private void refreshCurrentMoves() {
-        this.currentMoves = board.getMoves(turnPlayer);
-        this.dangerSquares = board.getDangerSquares(Tools.changeColor(turnPlayer));
-        this.kingInCheck = calculateIsKingInCheck();
-        checkEnPassant();
-        checkCastle();
-        this.currentMoves.addAll(enPassant);
-        this.currentMoves.addAll(castle);
+        if (pawnReadyToPromove != null) {
+            this.currentMoves = null;
+        }
+        else {
+            this.currentMoves = board.getMoves(turnPlayer);
+            this.dangerSquares = board.getDangerSquares(Tools.changeColor(turnPlayer));
+            this.kingInCheck = calculateIsKingInCheck();
+            checkEnPassant();
+            checkCastle();
+            this.currentMoves.addAll(enPassant);
+            this.currentMoves.addAll(castle);
 
-        this.validateLegalMovesConsideringCheck();
-
-
-        // Agregar movimientos especiales
-
-        // Revisar cuales no se pueden hacer pq provocan autojacke
+            this.validateLegalMovesConsideringCheck();
+        }
     }
 
     public void doMove(Position initialPosition, Position finalPosition)
-            throws IllegalMoveException, PendingPromoveException {
+            throws PendingPromoveException, IllegalMoveException {
         // Lo primero es revisar si hay un peon listo para coronar, si es asi, se debe hacer esto primero
         if (pawnReadyToPromove != null) {
             throw new PendingPromoveException("There is a pawn awating promotion");
@@ -163,6 +163,10 @@ public class EngineChess implements EngineChessInterface {
 
     public Piece getPiece(Position position) {
         return board.getPiece(position);
+    }
+
+    public boolean havePiecePendingPromotion() {
+        return pawnReadyToPromove != null;
     }
 
     private void changeTurn() {

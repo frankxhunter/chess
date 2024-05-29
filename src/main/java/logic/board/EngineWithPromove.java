@@ -11,4 +11,6 @@ public interface EngineWithPromove extends Engine {
     void doMove(Position initialPosition, Position finalPosition) throws IllegalMoveException, PendingPromoveException;
 
     void piecePromotion(String typePiece) throws IllegalPromoveException;
+
+    boolean havePiecePendingPromotion();
 }
