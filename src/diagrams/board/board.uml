@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>logic.board</OriginalElement>
+  <nodes>
+    <node x="527.9711765920939" y="969.0">logic.board.Engine</node>
+    <node x="659.5715392885645" y="0.0">logic.board.Board</node>
+    <node x="777.9063004289046" y="1427.0">logic.board.utils</node>
+    <node x="0.0" y="1095.0">logic.board.EngineWithPromove</node>
+    <node x="0.0" y="1427.0">logic.board.Vector</node>
+    <node x="1155.5715392885645" y="0.0">logic.board.Piece</node>
+    <node x="0.0" y="400.0">logic.board.StatusBoard</node>
+    <node x="1020.9711765920939" y="969.0">logic.board.Square</node>
+  </nodes>
+  <notes>
+    <note x="401.0" y="1448.0">
+      <node>logic.board.utils</node>
+      <value>Esto es una nota de prueba</value>
+      <edge>
+        <point x="0.0" y="0.0" />
+        <point x="0.0" y="0.0" />
+      </edge>
+    </note>
+  </notes>
+  <edges>
+    <edge source="logic.board.Board" target="logic.board.StatusBoard">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="logic.board.EngineWithPromove" target="logic.board.Engine">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Circular" zoom="0.8624887285843105" x="866.052014847568" y="452.5116854145667" />
+  <SelectedNodes>
+    <node>logic.board.Engine</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+
